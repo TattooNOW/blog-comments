@@ -550,9 +550,11 @@
     injectStyles();
     const widget = createWidget();
 
-    // Insert at end of article/main content, or append to body
+    // Insert at end of blog content area
+    // GHL pages use .blog-html-container-single for blog post content
     const target =
       document.querySelector("[data-comments-target]") ||
+      document.querySelector(".blog-html-container-single") ||
       document.querySelector("article") ||
       document.querySelector("main") ||
       document.body;
