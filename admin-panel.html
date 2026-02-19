@@ -9,7 +9,6 @@
     :root {
       --bg: #0a0a0a;
       --bg-card: #1a1a1a;
-      --bg-input: #252525;
       --text: #fafafa;
       --text-muted: #999;
       --border: #333;
@@ -43,39 +42,6 @@
     }
 
     .admin-header h1 span { color: var(--accent); }
-
-    .config-bar {
-      max-width: 900px;
-      margin: 0 auto 24px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 20px;
-      display: flex;
-      gap: 12px;
-      align-items: end;
-      flex-wrap: wrap;
-    }
-
-    .config-bar .field { flex: 1; min-width: 200px; }
-    .config-bar label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .config-bar input { width: 100%; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.85rem; font-family: 'Roboto', sans-serif; }
-    .config-bar input:focus { outline: none; border-color: var(--accent); }
-
-    .config-bar button {
-      padding: 8px 20px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-family: 'Roboto Slab', serif;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.85rem;
-      white-space: nowrap;
-    }
-
-    .config-bar button:hover { opacity: 0.9; }
 
     /* Tabs */
     .tabs {
@@ -228,18 +194,6 @@
     <h1><span>●</span> Comment Moderation</h1>
   </div>
 
-  <div class="config-bar">
-    <div class="field">
-      <label>Supabase Edge Function URL</label>
-      <input type="text" id="cfg-url" placeholder="https://xxx.supabase.co/functions/v1/comments" />
-    </div>
-    <div class="field">
-      <label>Admin API Key</label>
-      <input type="password" id="cfg-key" placeholder="Your COMMENTS_ADMIN_KEY" />
-    </div>
-    <button onclick="loadComments()">Connect</button>
-  </div>
-
   <div class="tabs" id="tabs">
     <div class="tab active" data-status="pending" onclick="switchTab('pending')">Pending <span class="badge" id="badge-pending">0</span></div>
     <div class="tab" data-status="approved" onclick="switchTab('approved')">Approved</div>
@@ -248,41 +202,22 @@
   </div>
 
   <div class="comments-list" id="comments-list">
-    <div class="empty-state">Enter your Supabase function URL and admin key above to connect.</div>
+    <div class="empty-state">Loading comments...</div>
   </div>
 
   <script>
     let allComments = [];
     let currentTab = 'pending';
 
-    function getConfig() {
-      return {
-        url: document.getElementById('cfg-url').value.trim(),
-        key: document.getElementById('cfg-key').value.trim(),
-      };
-    }
+    const CONFIG = {
+      url: 'https://ztueqtlqsjsfxskmyrgg.supabase.co/functions/v1/comments',
+      key: '1456574aad62289738959d2e4ad4c99464ac3a9a469e633d7c54b77efa54d2f3',
+    };
 
-    // Save/restore config from localStorage
-    (function restoreConfig() {
-      try {
-        const saved = localStorage.getItem('tnow_admin_config');
-        if (saved) {
-          const cfg = JSON.parse(saved);
-          document.getElementById('cfg-url').value = cfg.url || '';
-          document.getElementById('cfg-key').value = cfg.key || '';
-        }
-      } catch(e) {}
-    })();
-
-    function saveConfig() {
-      const cfg = getConfig();
-      try { localStorage.setItem('tnow_admin_config', JSON.stringify(cfg)); } catch(e) {}
-    }
+    function getConfig() { return CONFIG; }
 
     async function loadComments() {
       const cfg = getConfig();
-      if (!cfg.url || !cfg.key) { alert('Please enter URL and API key'); return; }
-      saveConfig();
 
       try {
         const res = await fetch(`${cfg.url}?admin=true`, {
@@ -383,6 +318,9 @@
       div.textContent = str || '';
       return div.innerHTML;
     }
+
+    // Auto-load on page open
+    loadComments();
   </script>
 </body>
 </html>
