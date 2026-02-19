@@ -1,7 +1,7 @@
 /**
  * TattooNOW Blog Comments Widget
  * ================================
- * Embed via: <script src="https://YOUR_DOMAIN/comment-widget.js" 
+ * Embed via: <script src="https://cdn.jsdelivr.net/gh/TattooNOW/blog-comments@main/comment-widget.js"
  *              data-supabase-url="https://xxx.supabase.co"
  *              data-supabase-fn="https://xxx.supabase.co/functions/v1/comments"
  *              defer></script>
@@ -17,15 +17,28 @@
   "use strict";
 
   // --- CONFIG FROM SCRIPT TAG ---
+  // document.currentScript works for direct <script> tags but is null for dynamically injected scripts.
+  // For the loader pattern, we fall back to querying by the data-supabase-fn attribute.
   const scriptTag = document.currentScript || document.querySelector('script[data-supabase-fn]');
-  // Detect GHL location ID: manual override > chat widget > hostname
+
+  // Detect GHL location ID with multiple fallback strategies
   function detectLocationId() {
+    // 1. Manual override via script attribute
     var manual = scriptTag?.getAttribute("data-location-id");
     if (manual) return manual;
+    // 2. GHL chat widget element (may load async, check anyway)
     var chatWidget = document.querySelector("chat-widget[location-id]");
     if (chatWidget) return chatWidget.getAttribute("location-id");
+    // 3. Any element with data-location-id
     var ghlDiv = document.querySelector("[data-location-id]");
     if (ghlDiv) return ghlDiv.getAttribute("data-location-id");
+    // 4. Extract GHL location ID from storage URLs in page (msgsndr pattern)
+    var imgSrc = document.querySelector('img[src*="msgsndr/"]');
+    if (imgSrc) {
+      var match = imgSrc.src.match(/msgsndr\/([^/]+)\//);
+      if (match) return match[1];
+    }
+    // 5. Hostname fallback
     return window.location.hostname;
   }
 
