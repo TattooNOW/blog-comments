@@ -366,10 +366,9 @@
   function createWidget() {
     const container = document.createElement("div");
     container.className = "tnow-admin";
-    var locationLabel = locationFilter ? " &middot; " + esc(locationFilter) : "";
     container.innerHTML = `
       <div class="tnow-admin-header">
-        <h1><span>&#9679;</span> Comment Moderation${locationLabel}</h1>
+        <h1><span>&#9679;</span> Comment Moderation</h1>
       </div>
       <div class="section-tabs" id="tnow-section-tabs">
         <div class="section-tab active" data-section="comments">Comments</div>
