@@ -356,7 +356,15 @@
         Comments <span class="count" id="tnow-count">0</span>
       </div>
 
-      <div class="tnow-form">
+      <div id="tnow-jump-link" style="display:none; margin-bottom: 16px;">
+        <a href="#tnow-form" style="color: ${CONFIG.accent}; font-size: 0.9rem; text-decoration: none; font-weight: 500;">Leave a comment</a>
+      </div>
+
+      <div id="tnow-list">
+        <div class="tnow-loading"><span class="spinner"></span> Loading comments...</div>
+      </div>
+
+      <div class="tnow-form" id="tnow-form">
         <div class="tnow-alert" id="tnow-alert"></div>
         <div class="tnow-form-row">
           <div>
@@ -379,10 +387,6 @@
           <span class="note">Your email won't be published. Comments are moderated.</span>
           <button class="tnow-submit" id="tnow-submit">Post Comment</button>
         </div>
-      </div>
-
-      <div id="tnow-list">
-        <div class="tnow-loading"><span class="spinner"></span> Loading comments...</div>
       </div>
     `;
     return container;
@@ -452,6 +456,7 @@
   async function renderComments() {
     const listEl = document.getElementById("tnow-list");
     const countEl = document.getElementById("tnow-count");
+    const jumpLink = document.getElementById("tnow-jump-link");
     const data = await fetchComments();
 
     const approved = data.comments || [];
@@ -460,6 +465,11 @@
 
     countEl.textContent = total;
     listEl.innerHTML = "";
+
+    // Show "Leave a comment" link if more than 2 comments
+    if (total + pending.length > 2) {
+      jumpLink.style.display = "block";
+    }
 
     // Show user's pending comments first
     pending.forEach((c) => listEl.appendChild(renderComment(c, true)));
