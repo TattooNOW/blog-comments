@@ -368,7 +368,7 @@
     container.className = "tnow-admin";
     container.innerHTML = `
       <div class="tnow-admin-header">
-        <h1><span>&#9679;</span> Comment Moderation</h1>
+        <h1><span>&#9679;</span> Blog Comment Moderation</h1>
       </div>
       <div class="section-tabs" id="tnow-section-tabs">
         <div class="section-tab active" data-section="comments">Comments</div>
