@@ -18,10 +18,21 @@
 
   // --- CONFIG FROM SCRIPT TAG ---
   const scriptTag = document.currentScript || document.querySelector('script[data-supabase-fn]');
+  // Detect GHL location ID: manual override > chat widget > hostname
+  function detectLocationId() {
+    var manual = scriptTag?.getAttribute("data-location-id");
+    if (manual) return manual;
+    var chatWidget = document.querySelector("chat-widget[location-id]");
+    if (chatWidget) return chatWidget.getAttribute("location-id");
+    var ghlDiv = document.querySelector("[data-location-id]");
+    if (ghlDiv) return ghlDiv.getAttribute("data-location-id");
+    return window.location.hostname;
+  }
+
   const CONFIG = {
     supabaseUrl: scriptTag?.getAttribute("data-supabase-url") || "",
     functionUrl: scriptTag?.getAttribute("data-supabase-fn") || "",
-    locationId: scriptTag?.getAttribute("data-location-id") || "",
+    locationId: detectLocationId(),
     blogSlug: scriptTag?.getAttribute("data-blog-slug") || window.location.pathname,
     blogTitle: scriptTag?.getAttribute("data-blog-title") || document.title,
     theme: scriptTag?.getAttribute("data-theme") || "dark",
@@ -30,11 +41,6 @@
 
   if (!CONFIG.functionUrl) {
     console.error("[TattooNOW Comments] Missing data-supabase-fn attribute on script tag.");
-    return;
-  }
-
-  if (!CONFIG.locationId) {
-    console.error("[TattooNOW Comments] Missing data-location-id attribute on script tag.");
     return;
   }
 
