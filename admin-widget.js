@@ -33,14 +33,14 @@
       @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap');
 
       .tnow-admin {
-        --bg: #0a0a0a;
-        --bg-card: #1a1a1a;
-        --text: #fafafa;
-        --text-muted: #999;
-        --border: #333;
+        --bg: #f0f0f0;
+        --bg-card: #ffffff;
+        --text: #1a1a1a;
+        --text-muted: #666;
+        --border: #ddd;
         --accent: #EA9320;
-        --green: #4ade80;
-        --red: #f87171;
+        --green: #16a34a;
+        --red: #dc2626;
 
         font-family: 'Roboto', sans-serif;
         background: var(--bg);
@@ -155,7 +155,7 @@
       .tnow-admin .comment-body {
         font-size: 0.9rem;
         line-height: 1.6;
-        color: #fafafadd;
+        color: #1a1a1add;
         margin: 12px 0;
         white-space: pre-wrap;
         word-break: break-word;
@@ -178,9 +178,9 @@
       }
 
       .tnow-admin .btn-approve { color: var(--green); border-color: var(--green); }
-      .tnow-admin .btn-approve:hover { background: var(--green); color: var(--bg); }
+      .tnow-admin .btn-approve:hover { background: var(--green); color: #fff; }
       .tnow-admin .btn-reject { color: var(--red); border-color: var(--red); }
-      .tnow-admin .btn-reject:hover { background: var(--red); color: var(--bg); }
+      .tnow-admin .btn-reject:hover { background: var(--red); color: #fff; }
       .tnow-admin .btn-spam { color: var(--text-muted); border-color: var(--border); }
       .tnow-admin .btn-spam:hover { background: var(--border); color: var(--text); }
 
@@ -201,16 +201,16 @@
         margin-left: 8px;
       }
 
-      .tnow-admin .status-badge.approved { color: var(--green); background: #0d3320; }
-      .tnow-admin .status-badge.rejected { color: var(--red); background: #3b1111; }
-      .tnow-admin .status-badge.spam { color: var(--text-muted); background: #2a2a2a; }
-      .tnow-admin .status-badge.pending { color: var(--accent); background: #EA932033; }
+      .tnow-admin .status-badge.approved { color: var(--green); background: #dcfce7; }
+      .tnow-admin .status-badge.rejected { color: var(--red); background: #fee2e2; }
+      .tnow-admin .status-badge.spam { color: var(--text-muted); background: #e5e5e5; }
+      .tnow-admin .status-badge.pending { color: var(--accent); background: #EA932020; }
     `;
 
     const style = document.createElement("style");
     style.textContent = css;
     document.head.appendChild(style);
-    document.body.style.background = "#0a0a0a";
+    document.body.style.background = "#f0f0f0";
   }
 
   // --- WIDGET HTML ---
