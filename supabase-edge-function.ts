@@ -84,8 +84,21 @@ async function checkSpamKeywords(text: string): Promise<{ isSpam: boolean; actio
 // --- GHL WEBHOOK ---
 
 async function sendGHLWebhook(comment: Record<string, unknown>) {
-  if (!GHL_WEBHOOK_URL) {
-    console.log("No GHL webhook URL configured, skipping");
+  // Look up per-location webhook first, fall back to global env var
+  let webhookUrl = GHL_WEBHOOK_URL;
+
+  const { data: locationWebhook } = await supabase
+    .from("location_webhooks")
+    .select("webhook_url")
+    .eq("location_id", comment.location_id as string)
+    .single();
+
+  if (locationWebhook?.webhook_url) {
+    webhookUrl = locationWebhook.webhook_url;
+  }
+
+  if (!webhookUrl) {
+    console.log("No webhook URL for location", comment.location_id);
     return;
   }
 
@@ -103,7 +116,7 @@ async function sendGHLWebhook(comment: Record<string, unknown>) {
       source: "tattoonow_blog_comments",
     };
 
-    const response = await fetch(GHL_WEBHOOK_URL, {
+    const response = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -239,6 +252,26 @@ async function handleFetch(req: Request): Promise<Response> {
       );
     }
 
+    // Webhook list request
+    if (url.searchParams.get("webhooks") === "true") {
+      const { data: webhooks, error: whError } = await supabase
+        .from("location_webhooks")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (whError) {
+        return new Response(
+          JSON.stringify({ error: "Failed to fetch webhooks" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ webhooks: webhooks || [] }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { data, error } = await supabase
       .from("comments")
       .select("*")
@@ -312,7 +345,67 @@ async function handleAdmin(req: Request): Promise<Response> {
     );
   }
 
-  const { comment_id, action, reviewed_by } = await req.json();
+  const body = await req.json();
+  const { action } = body;
+
+  // --- Webhook management ---
+  if (action === "set_webhook") {
+    const { location_id, webhook_url } = body;
+    if (!location_id || !webhook_url) {
+      return new Response(
+        JSON.stringify({ error: "location_id and webhook_url required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("location_webhooks")
+      .upsert({ location_id, webhook_url }, { onConflict: "location_id" })
+      .select()
+      .single();
+
+    if (error) {
+      return new Response(
+        JSON.stringify({ error: "Failed to save webhook" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ success: true, webhook: data }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  if (action === "delete_webhook") {
+    const { location_id } = body;
+    if (!location_id) {
+      return new Response(
+        JSON.stringify({ error: "location_id required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { error } = await supabase
+      .from("location_webhooks")
+      .delete()
+      .eq("location_id", location_id);
+
+    if (error) {
+      return new Response(
+        JSON.stringify({ error: "Failed to delete webhook" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ success: true }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+
+  // --- Comment moderation ---
+  const { comment_id, reviewed_by } = body;
 
   if (!comment_id || !["approve", "reject", "spam"].includes(action)) {
     return new Response(

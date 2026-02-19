@@ -91,7 +91,21 @@ CREATE POLICY "Service role manages rate limits"
   ON public.rate_limits FOR ALL
   USING (true);
 
--- 6. CLEANUP FUNCTION (run periodically to purge old rate limit records)
+-- 6. LOCATION WEBHOOKS TABLE (per-location webhook URLs)
+CREATE TABLE public.location_webhooks (
+  id SERIAL PRIMARY KEY,
+  location_id TEXT NOT NULL UNIQUE,
+  webhook_url TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.location_webhooks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role manages location webhooks"
+  ON public.location_webhooks FOR ALL
+  USING (true);
+
+-- 7. CLEANUP FUNCTION (run periodically to purge old rate limit records)
 CREATE OR REPLACE FUNCTION cleanup_rate_limits()
 RETURNS void AS $$
 BEGIN
