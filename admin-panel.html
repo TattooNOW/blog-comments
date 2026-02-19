@@ -211,13 +211,17 @@
 
     const CONFIG = {
       url: 'https://ztueqtlqsjsfxskmyrgg.supabase.co/functions/v1/comments',
-      key: '1456574aad62289738959d2e4ad4c99464ac3a9a469e633d7c54b77efa54d2f3',
+      key: '',
     };
 
     function getConfig() { return CONFIG; }
 
     async function loadComments() {
       const cfg = getConfig();
+      if (!cfg.key) {
+        cfg.key = prompt('Enter admin API key:');
+        if (!cfg.key) return;
+      }
 
       try {
         const res = await fetch(`${cfg.url}?admin=true`, {
