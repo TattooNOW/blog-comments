@@ -22,7 +22,7 @@
 
   // Check URL for location_id filter
   const urlParams = new URLSearchParams(window.location.search);
-  const locationFilter = urlParams.get("location_id") || "";
+  const locationFilter = urlParams.get("locationId") || urlParams.get("location_id") || "";
 
   let allComments = [];
   let currentTab = "pending";
@@ -210,6 +210,7 @@
     const style = document.createElement("style");
     style.textContent = css;
     document.head.appendChild(style);
+    document.body.style.background = "#0a0a0a";
   }
 
   // --- WIDGET HTML ---
