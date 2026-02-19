@@ -5,6 +5,7 @@
 -- 1. COMMENTS TABLE
 CREATE TABLE public.comments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  location_id TEXT NOT NULL,          -- GHL location/site identifier to scope comments per site
   blog_slug TEXT NOT NULL,           -- URL path/slug of the blog post
   blog_title TEXT,                    -- Optional: blog post title for admin context
   author_name TEXT NOT NULL,
@@ -20,7 +21,7 @@ CREATE TABLE public.comments (
 );
 
 -- 2. INDEXES
-CREATE INDEX idx_comments_blog_slug ON public.comments(blog_slug);
+CREATE INDEX idx_comments_location_slug ON public.comments(location_id, blog_slug);
 CREATE INDEX idx_comments_status ON public.comments(status);
 CREATE INDEX idx_comments_commenter_token ON public.comments(commenter_token);
 CREATE INDEX idx_comments_created_at ON public.comments(created_at DESC);

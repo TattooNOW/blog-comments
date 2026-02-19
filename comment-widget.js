@@ -21,6 +21,7 @@
   const CONFIG = {
     supabaseUrl: scriptTag?.getAttribute("data-supabase-url") || "",
     functionUrl: scriptTag?.getAttribute("data-supabase-fn") || "",
+    locationId: scriptTag?.getAttribute("data-location-id") || "",
     blogSlug: scriptTag?.getAttribute("data-blog-slug") || window.location.pathname,
     blogTitle: scriptTag?.getAttribute("data-blog-title") || document.title,
     theme: scriptTag?.getAttribute("data-theme") || "dark",
@@ -29,6 +30,11 @@
 
   if (!CONFIG.functionUrl) {
     console.error("[TattooNOW Comments] Missing data-supabase-fn attribute on script tag.");
+    return;
+  }
+
+  if (!CONFIG.locationId) {
+    console.error("[TattooNOW Comments] Missing data-location-id attribute on script tag.");
     return;
   }
 
@@ -366,7 +372,7 @@
   // --- API CALLS ---
   async function fetchComments() {
     const token = getCommenterToken();
-    const params = new URLSearchParams({ blog_slug: CONFIG.blogSlug });
+    const params = new URLSearchParams({ location_id: CONFIG.locationId, blog_slug: CONFIG.blogSlug });
     if (token) params.append("commenter_token", token);
 
     try {
@@ -386,6 +392,7 @@
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        location_id: CONFIG.locationId,
         blog_slug: CONFIG.blogSlug,
         blog_title: CONFIG.blogTitle,
         author_name: name,

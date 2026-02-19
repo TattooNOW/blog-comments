@@ -334,7 +334,7 @@
               <span class="comment-author">${esc(c.author_name)}</span>
               <span class="status-badge ${c.status}">${c.status}</span>
               <div class="comment-email">${esc(c.author_email)}</div>
-              <div class="comment-slug">${esc(c.blog_slug)}</div>
+              <div class="comment-slug">${esc(c.location_id)} · ${esc(c.blog_slug)}</div>
             </div>
             <span class="comment-time">${new Date(c.created_at).toLocaleString()}</span>
           </div>
