@@ -20,6 +20,10 @@
     return;
   }
 
+  // Check URL for location_id filter
+  const urlParams = new URLSearchParams(window.location.search);
+  const locationFilter = urlParams.get("location_id") || "";
+
   let allComments = [];
   let currentTab = "pending";
 
@@ -39,10 +43,12 @@
         --red: #f87171;
 
         font-family: 'Roboto', sans-serif;
+        background: var(--bg);
         color: var(--text);
         max-width: 900px;
         margin: 0 auto;
         padding: 24px 16px;
+        min-height: 100vh;
       }
 
       .tnow-admin * { box-sizing: border-box; }
@@ -210,9 +216,10 @@
   function createWidget() {
     const container = document.createElement("div");
     container.className = "tnow-admin";
+    var locationLabel = locationFilter ? " &middot; " + esc(locationFilter) : "";
     container.innerHTML = `
       <div class="tnow-admin-header">
-        <h1><span>&#9679;</span> Comment Moderation</h1>
+        <h1><span>&#9679;</span> Comment Moderation${locationLabel}</h1>
       </div>
       <div class="tabs" id="tnow-admin-tabs"></div>
       <div id="tnow-admin-list">
@@ -239,6 +246,9 @@
 
       const data = await res.json();
       allComments = data.comments || [];
+      if (locationFilter) {
+        allComments = allComments.filter(function (c) { return c.location_id === locationFilter; });
+      }
       renderTabs();
       renderTab();
     } catch (err) {
